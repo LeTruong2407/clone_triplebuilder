@@ -1,0 +1,14 @@
+{
+  "name": "triple_builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tweenjs/tween.js": "^23.1.2",
+    "three": "^0.164.1",
+    "vite": "^5.2.12"
+  }
+}

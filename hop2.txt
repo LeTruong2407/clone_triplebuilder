@@ -1,0 +1,19 @@
+Logic game, web, hud,....
+
+
+Đồ hoạ:
+load model:
+xe, nhà, máy bay
+
+chiếu sáng:
+Vị trí của nguồn sáng chính thay đổi theo thời gian
+
+texture mapping:
+4 mặt xung quanh bàn cờ (đất minecraft)
+đường viền trên ô bàn cờ
+
+Animation: 
+Máy bay: bay (vòng tròn, số 8, thẳng, lả lướt...)
+Ô tô: đi thẳng theo viền bàn cờ
+
+

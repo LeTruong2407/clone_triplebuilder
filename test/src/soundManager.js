@@ -1,0 +1,76 @@
+import { Audio, AudioListener, Camera, AudioLoader } from "three";
+
+/**
+ * 사운드 관리자
+ */
+export class SoundManager {
+    
+    camera;
+    listener;
+    sounds;
+
+    /**
+     * 생성자
+     */
+    constructor(camera) {
+        this.camera = camera;
+
+        // 오디오 리스너 생성
+        this.listener = new AudioListener();
+        this.camera.add(this.listener);
+
+        // 위치를 가지는 오디오는 아니므로 non-positional 오디오 생성
+        const scope = this;
+        this.sounds = {};
+        const audioLoader = new AudioLoader();
+        // 배경음악
+        audioLoader.load('sounds/BGM.wav', (buffer) =>{
+            
+            const sound = new Audio(scope.listener);
+            sound.setBuffer(buffer);
+            sound.setLoop(true); // 배경음은 반복재생
+            sound.setVolume(0.25);
+            
+            scope.sounds['BGM'] = sound;
+
+        }, null, (err) => {
+            console.error(err);
+        });
+        // 건물 생성
+        audioLoader.load('sounds/CreateBuilding.wav', (buffer) =>{
+            
+            const sound = new Audio(scope.listener);
+            sound.setBuffer(buffer);
+            sound.setLoop(false);
+            sound.setVolume(0.1);
+
+            scope.sounds['CreateBuilding'] = sound;
+
+        }, null, (err) => {
+            console.error(err);
+        });
+        // 스코어취득
+        audioLoader.load('sounds/Score.wav', (buffer) =>{
+            
+            const sound = new Audio(scope.listener);
+            sound.setBuffer(buffer);
+            sound.setLoop(false);
+            sound.setVolume(0.1);
+            
+            scope.sounds['Score'] = sound;
+
+        }, null, (err) => {
+            console.error(err);
+        });
+    }
+    
+    /**
+     * 사운드재생
+     * @param key 재생할 사운드 키값
+     */
+    playSound(key) {
+        if(this.sounds.hasOwnProperty(key)) {
+            this.sounds[key].play();
+        }
+    }
+}

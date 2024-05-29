@@ -1,0 +1,15 @@
+{
+  "name": "triplebuilder_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx http-server ./ -p 8080"
+  },
+  "author": "Baek In Sun",
+  "license": "ISC",
+  "dependencies": {
+    "http-server": "^0.12.3"
+  }
+}
