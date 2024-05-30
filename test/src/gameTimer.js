@@ -1,9 +1,7 @@
 import { Vector3, MeshPhongMaterial, Group, Mesh, Plane, Color } from "three";
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
-import { GameLogic } from "./gamelogic.js";
 
 /**
  * 게임 시간 표시
@@ -50,7 +48,7 @@ export class GameTimer {
             const geometry = new TextGeometry(text, {
                 font: this.fontData,
                 size: 2.5,
-                height: 2
+                depth: 2
             });
 
             // geometry의 바운딩을 계산하여 중점으로 이동
@@ -89,7 +87,7 @@ export class GameTimer {
         const geometry = new TextGeometry('GameOver', {
             font: this.fontData,
             size: 10,
-            height: 2
+            depth: 2
         });
 
         // geometry의 바운딩을 계산하여 중점으로 이동

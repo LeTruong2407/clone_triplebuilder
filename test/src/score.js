@@ -4,7 +4,6 @@ import { MeshPhongMaterial, Mesh, Vector3, Plane, Box3, Group } from 'three';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { ScorePopup } from './scorePopup.js';
-import { Tile } from './board.js';
 
 /**
  * 점수 관리 클래스
@@ -83,7 +82,7 @@ export class ScoreManager {
             const geometry = new TextGeometry(text, {
                 font: this.fontData,
                 size: 10,
-                height: 2
+                depth: 2
             });
 
             // geometry의 바운딩을 계산하여 중점으로 이동
@@ -105,7 +104,7 @@ export class ScoreManager {
             const geometry = new TextGeometry(text, {
                 font: this.popupFontData,
                 size: 2,
-                height: 1
+                depth: 1
             });
 
             // 중점
@@ -150,7 +149,7 @@ export class ScoreManager {
             const geometry = new TextGeometry(text, {
                 font: this.fontData,
                 size: 3,
-                height: 2
+                depth: 2
             });
 
             // geometry의 바운딩을 계산하여 중점으로 이동

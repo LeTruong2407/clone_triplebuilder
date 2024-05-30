@@ -1,12 +1,5 @@
 import { Raycaster, Mesh, Object3D, Vector2 } from "three";
-import { Board, Tile } from "./board";
-import { ModelManager } from "./model";
 import * as TWEEN from '@tweenjs/tween.js';
-import { ScoreManager } from "./score";
-import { SoundManager } from "./soundManager";
-import { TileHolder } from "./tileHolder";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { GameTimer } from "./gameTimer";
 
 export class GameLogic {
 

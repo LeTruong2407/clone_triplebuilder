@@ -50,7 +50,7 @@ export class TileHolder {
         this.geometry = new TextGeometry('Hold:', {
             font: this.fontData,
             size: 8,
-            height: 2
+            depth: 2
         });
         this.geometry.computeBoundingBox();
         const size = new Vector3();

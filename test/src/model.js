@@ -2,7 +2,6 @@ import { Mesh, MeshPhongMaterial } from "three";
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 
-import * as TWEEN from '@tweenjs/tween.js';
 /**
  * 모델 관리 클래스
  */

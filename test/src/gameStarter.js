@@ -45,7 +45,7 @@ export class GameStarter {
         const geometry = new TextGeometry('Game Start', {
             font: this.fontData,
             size: 10,
-            height: 5
+            depth: 5
         });
         geometry.computeBoundingBox();
         const size = new Vector3();
