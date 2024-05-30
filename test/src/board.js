@@ -1,13 +1,5 @@
 import { BoxGeometry, MeshPhongMaterial, Mesh, MeshBasicMaterial, Box3, Sphere, Vector3, Plane, MathUtils as THREEMATH } from "three";
-import { ModelManager } from './model';
 import * as TWEEN from '@tweenjs/tween.js';
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { MapControls } from 'three/addons/controls/MapControls.js';
-import { ScoreManager } from "./score";
-import { SoundManager } from "./soundManager";
-import { TileHolder } from "./tileHolder";
-import { GameStarter } from "./gameStarter";
-import { GameTimer } from "./gameTimer";
 
 /**
  * 타일 요소
