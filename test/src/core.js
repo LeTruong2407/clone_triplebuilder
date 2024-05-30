@@ -59,13 +59,13 @@ export class Core {
         this.scene.background = new Color(0xcccccc);
 
         // 라이트
-        this.hemiLight = new HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+        this.hemiLight = new HemisphereLight( 0xffffff, 0xffffff, 1 );
         this.hemiLight.color.setHSL( 0.6, 1, 0.6 );
         this.hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
         this.hemiLight.position.set( 0, 50, 0 );
         this.scene.add( this.hemiLight );
 
-        this.dirLight = new DirectionalLight( 0xffffff, 0.6 );
+        this.dirLight = new DirectionalLight( 0xffffff, 2 );
         this.dirLight.color.setHSL( 0.1, 1, 0.95 );
         this.dirLight.position.set( 1, 1.75, -1 );
         this.dirLight.position.multiplyScalar( 30 );
@@ -203,7 +203,5 @@ export class Core {
         this.dispose();
 
         this.board.createMap(mapWidth, mapHeight);
-        //this.gameLogic.createCursor();
-
     }
 }
