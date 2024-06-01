@@ -52,7 +52,7 @@ export class GameStarter {
         geometry.boundingBox.getSize(size);
         geometry.translate(size.x * -0.5, size.y * -0.5, size.z * -0.5);
 
-        const material = new MeshPhongMaterial({ color: 0x00ff00 });
+        const material = new MeshPhongMaterial({ color: 0xff0000});
         this.text = new Mesh(geometry, material);
         this.scene.add(this.text);
 
