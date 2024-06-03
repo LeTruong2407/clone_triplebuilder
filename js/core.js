@@ -1,45 +1,44 @@
-import { Math as THREEMATH, Clock, Color, DirectionalLight, HemisphereLight, Mesh, MeshPhongMaterial, PCFSoftShadowMap, PerspectiveCamera, PlaneBufferGeometry, Scene, WebGLRenderer, Raycaster, Vector2, FontLoader, TextBufferGeometry, Vector3, Plane } from 'three';
+import { Clock, Color, DirectionalLight, HemisphereLight, PCFSoftShadowMap, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Board } from './board';
-import { ModelManager } from './model';
-import { GameLogic } from './gamelogic';
-import { ScoreManager } from './score';
+import { Board } from './board.js';
+import { ModelManager } from './model.js';
+import { GameLogic } from './gamelogic.js';
+import { ScoreManager } from './score.js';
 import * as TWEEN from '@tweenjs/tween.js';
-import * as Font_Bold_Italic from './Open_Sans_Bold_Italic.json';
-import { SoundManager } from './soundManager';
-import { TileHolder } from './tileHolder';
-import { GameStarter } from './gameStarter';
-import { GameTimer } from './gameTimer';
+import { SoundManager } from './soundManager.js';
+import { TileHolder } from './tileHolder.js';
+import { GameStarter } from './gameStarter.js';
+import { GameTimer } from './gameTimer.js';
 
 /**
  * 엔진 코어
  */
 export class Core {
     // 변수
-    private renderer: WebGLRenderer;
-    private scene: Scene;
-    private camera: PerspectiveCamera;
-    private control: OrbitControls;
-    private clock: Clock;
+    renderer;
+    scene;
+    camera;
+    control;
+    clock;
 
-    private hemiLight: HemisphereLight;
-    private dirLight: DirectionalLight;
+    hemiLight;
+    dirLight;
 
     // 로직
-    private scoreMgr: ScoreManager;
-    private model: ModelManager;
-    private board: Board;
-    private gameLogic: GameLogic;
-    private soundMgr: SoundManager;
-    private tileHolder: TileHolder;
-    private gameStarter: GameStarter;
-    private gameTimer: GameTimer;
+    scoreMgr;
+    model;
+    board;
+    gameLogic;
+    soundMgr;
+    tileHolder;
+    gameStarter;
+    gameTimer;
     
 
     /**
      * 생성자
      */
-    constructor(onReady?: Function) {
+    constructor(onReady, scoreUI) {
         
         this.clock = new Clock();
 
@@ -60,13 +59,13 @@ export class Core {
         this.scene.background = new Color(0xcccccc);
 
         // 라이트
-        this.hemiLight = new HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+        this.hemiLight = new HemisphereLight( 0xffffff, 0xffffff, 1 );
         this.hemiLight.color.setHSL( 0.6, 1, 0.6 );
         this.hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
         this.hemiLight.position.set( 0, 50, 0 );
         this.scene.add( this.hemiLight );
 
-        this.dirLight = new DirectionalLight( 0xffffff, 0.6 );
+        this.dirLight = new DirectionalLight( 0xffffff, 2 );
         this.dirLight.color.setHSL( 0.1, 1, 0.95 );
         this.dirLight.position.set( 1, 1.75, -1 );
         this.dirLight.position.multiplyScalar( 30 );
@@ -114,7 +113,7 @@ export class Core {
             // 사운드 관리자
             scope.soundMgr = new SoundManager(scope.camera);
             // 스코어 객체
-            scope.scoreMgr = new ScoreManager(scope.scene, scope.camera, scope.control);
+            scope.scoreMgr = new ScoreManager(scope.scene, scope.camera, scope.control, scoreUI);
             // 게임판 인스턴스
             scope.board = new Board(scope.scene, scope.model, scope.camera, scope.control, scope.scoreMgr, scope.soundMgr, scope.gameTimer);
             // 게임로직
@@ -159,7 +158,7 @@ export class Core {
     /**
      * 창크기변경 이벤트
      */
-    private onResize() {
+    onResize() {
 
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
@@ -171,7 +170,7 @@ export class Core {
     /**
      * 렌더링 루프
      */
-    private render() {
+    render() {
         requestAnimationFrame(this.render.bind(this));
 
         const deltaTime = this.clock.getDelta();
@@ -189,7 +188,7 @@ export class Core {
     /**
      * 메모리 해제
      */
-    public dispose() {
+    dispose() {
         this.board.dispose();
         this.gameLogic.disposeCursor();
     }
@@ -199,12 +198,10 @@ export class Core {
      * @param mapWidth 맵 가로 너비
      * @param mapHeight 맵 세로 너비
      */
-    public createGame(mapWidth: number, mapHeight: number) {
+    createGame(mapWidth, mapHeight) {
 
         this.dispose();
 
         this.board.createMap(mapWidth, mapHeight);
-        //this.gameLogic.createCursor();
-
     }
 }

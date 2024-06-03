@@ -1,49 +1,53 @@
 import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
 import * as FontData_Bold from './Open_Sans_Bold.json';
-import { Font, FontLoader, TextBufferGeometry, Scene, MeshPhongMaterial, Mesh, Vector3, Sphere, Quaternion, PerspectiveCamera, Camera, Spherical, Plane, Box3, Group } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ScorePopup } from './scorePopup';
-import { Tile } from './board.js';
+import { MeshPhongMaterial, Mesh, Vector3, Plane, Box3, Group } from 'three';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { ScorePopup } from './scorePopup.js';
 
 /**
  * 점수 관리 클래스
  */
 export class ScoreManager {
 
-    private scene: Scene;
-    private camera: Camera;
-    private control: OrbitControls;
+    scene;
+    camera;
+    control;
 
-    private fontData: Font;
-    private geometries: Record<string, TextBufferGeometry>;
+    fontData;
+    geometries;
 
-    private popupFontData: Font;
-    private popupGeometries: Record<string, TextBufferGeometry>;
-    private sharedPopupMaterial: MeshPhongMaterial;
-    private popupObjList: ScorePopup[];
+    popupFontData;
+    popupGeometries;
+    sharedPopupMaterial;
+    popupObjList;
 
-    private scoreTable: number[];
-    private score: number;
+    scoreTable;
+    score;
+    scoreUI
 
-    public sphere: Sphere;
+    sphere;
 
-    private resultScoreRoot: Group;
-    private resultScoreSharedMaterial: MeshPhongMaterial;
-    private resultScoreInterval: number;
+    resultScoreRoot;
+    resultScoreSharedMaterial;
+    resultScoreInterval;
     
-    private highScoreRoot: Group;
-    private highScore: number;
-    private highScoreGeometries: Record<string, TextBufferGeometry>;
-    private highScoreInterval: number;
+    highScoreRoot;
+    highScore;
+    highScoreGeometries;
+    highScoreInterval;
+    highScoreUI
 
     /**
      * 생성자
      */
-    constructor(scene: Scene, camera: Camera, control: OrbitControls) {
+    constructor(scene, camera, control, scoreUI, highScoreUI) {
         
         this.scene = scene;
         this.camera = camera;
         this.control = control;
+        this.scoreUI = scoreUI;
+        this.highScoreUI = highScoreUI;
         this.score = 0;
 
         // localstorage에 저장되어 있는 하이스코어를 가져옴
@@ -79,10 +83,10 @@ export class ScoreManager {
         const textList = [ 'Score:', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ];
         this.geometries = {};
         textList.forEach( (text, i) => {
-            const geometry = new TextBufferGeometry(text, {
+            const geometry = new TextGeometry(text, {
                 font: this.fontData,
                 size: 10,
-                height: 2
+                depth: 2
             });
 
             // geometry의 바운딩을 계산하여 중점으로 이동
@@ -101,10 +105,10 @@ export class ScoreManager {
         const popupTextList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'x'];
         this.popupGeometries = {};
         popupTextList.forEach( text => {
-            const geometry = new TextBufferGeometry(text, {
+            const geometry = new TextGeometry(text, {
                 font: this.popupFontData,
                 size: 2,
-                height: 1
+                depth: 1
             });
 
             // 중점
@@ -146,10 +150,10 @@ export class ScoreManager {
         const highScoreTextList = ['HighScore:', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         this.highScoreGeometries = {};
         highScoreTextList.forEach( (text, i) => {
-            const geometry = new TextBufferGeometry(text, {
+            const geometry = new TextGeometry(text, {
                 font: this.fontData,
                 size: 3,
-                height: 2
+                depth: 2
             });
 
             // geometry의 바운딩을 계산하여 중점으로 이동
@@ -181,9 +185,10 @@ export class ScoreManager {
      * 지정된 숫자로 점수 설정
      * @param score 점수
      */
-    setScore(score: number) {
+    setScore(score) {
         
         this.score = score;
+        this.scoreUI.textContent() = this.score.toString()
         this.updateScoreMesh();
     }
 
@@ -192,7 +197,7 @@ export class ScoreManager {
      * @param tile 레벨
      * @param comboRatio 콤보배율
      */
-    addScore(tile: Tile, comboRatio: number) {
+    addScore(tile, comboRatio) {
 
         if( 1 <= tile.level && tile.level <= 9 ) {
 
@@ -232,6 +237,7 @@ export class ScoreManager {
             this.popupObjList.push(popup);
 
             this.updateScoreMesh();
+            this.scoreUI.textContent = this.score.toString()
             if( this.score >= this.highScore ) {
                 this.highScore = this.score;
                 this.saveHighScore();
@@ -283,7 +289,7 @@ export class ScoreManager {
         // 위치 조정
         let minX = Number.MAX_VALUE, maxX = Number.MIN_VALUE, halfX = null;
         for(let i = 1; i < this.resultScoreRoot.children.length; i++) {
-            const child = <Mesh>this.resultScoreRoot.children[i];
+            const child = this.resultScoreRoot.children[i];
             
             const currBox = child.geometry.boundingBox.clone();
             currBox.translate(child.position);
@@ -296,8 +302,6 @@ export class ScoreManager {
             const child = this.resultScoreRoot.children[i];
             child.translateX(-halfX);
         }
-
-
     }
 
     /**
@@ -344,7 +348,7 @@ export class ScoreManager {
         // 위치 조정
         let minX = Number.MAX_VALUE, maxX = Number.MIN_VALUE, halfX = null;
         for(let i = 1; i < this.highScoreRoot.children.length; i++) {
-            const child = <Mesh>this.highScoreRoot.children[i];
+            const child = this.highScoreRoot.children[i];
             
             const currBox = child.geometry.boundingBox.clone();
             currBox.translate(child.position);
@@ -363,7 +367,7 @@ export class ScoreManager {
     /**
      * 업데이트
      */
-    update(deltaTime: number) {
+    update(deltaTime) {
 
         if( this.sphere ) {
 
@@ -405,7 +409,7 @@ export class ScoreManager {
      * 가시화 설정
      * @param isVisible 가시화 여부
      */
-    setVisible(isVisible: boolean) {
+    setVisible(isVisible) {
         this.resultScoreRoot.visible = isVisible;
         this.highScoreRoot.visible = isVisible;
     }

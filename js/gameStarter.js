@@ -1,5 +1,6 @@
-import { Scene, Camera, Font, FontLoader, TextBufferGeometry, Vector3, MeshPhongMaterial, Mesh, Sphere, Plane, BoxBufferGeometry, Raycaster, Vector2, Box3 } from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Vector3, MeshPhongMaterial, Mesh, Sphere, Plane, BoxGeometry, Raycaster, Vector2, Box3 } from "three";
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
 
 /**
@@ -7,29 +8,29 @@ import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
  */
 export class GameStarter {
 
-    private scene: Scene;
-    private camera: Camera;
-    private control: OrbitControls;
+    scene;
+    camera;
+    control;
 
-    private fontData: Font;
-    private text: Mesh;
-    private underLine: Mesh;
+    fontData;
+    text;
+    underLine;
     
-    private rayCast: Raycaster;
-    private mousePos: Vector2;
-    private mouseDownPos: Vector2;
-    private pointerDownBinder: any;
-    private pointerMoveBinder: any;
-    private pointerUpBinder: any;
-    private pickSphere: Sphere;
+    rayCast;
+    mousePos;
+    mouseDownPos;
+    pointerDownBinder;
+    pointerMoveBinder;
+    pointerUpBinder;
+    pickSphere;
 
-    private onStart: Function;
+    onStart;
 
-    public boardSphere: Sphere;
+    boardSphere;
     /**
      * 생성자
      */
-    constructor(scene: Scene, camera: Camera, control: OrbitControls, onStart: Function) {
+    constructor(scene, camera, control, onStart) {
 
         this.scene = scene;
         this.camera = camera;
@@ -41,10 +42,10 @@ export class GameStarter {
         this.fontData = fontLoader.parse(FontData_Bold_Italic);
 
         // 문자열 geometry 생성
-        const geometry = new TextBufferGeometry('Game Start', {
+        const geometry = new TextGeometry('Game Start', {
             font: this.fontData,
             size: 10,
-            height: 5
+            depth: 5
         });
         geometry.computeBoundingBox();
         const size = new Vector3();
@@ -56,7 +57,7 @@ export class GameStarter {
         this.scene.add(this.text);
 
         // 픽킹시 가시화할 텍스트 밑줄 객체
-        const underLineGeometry = new BoxBufferGeometry(size.x, 2, 5);
+        const underLineGeometry = new BoxGeometry(size.x, 2, 5);
         this.underLine = new Mesh(underLineGeometry, material);
         this.text.add(this.underLine);
         this.underLine.position.set(0, (size.y * -0.5) - 1.5, 0);
@@ -80,7 +81,7 @@ export class GameStarter {
     /**
      * 업데이트
      */
-    update(deltaTime: number){
+    update(deltaTime){
 
         const camForward = new Vector3();
         this.camera.getWorldDirection(camForward);
@@ -109,7 +110,7 @@ export class GameStarter {
      * 포인터 다운 이벤트 처리
      * @param event 마우스 이벤트
      */
-    onPointerDown(event: PointerEvent) {
+    onPointerDown(event) {
         if( event.button === 0 ) { // 좌클릭, 1-터치
             this.mouseDownPos.x = event.screenX;
             this.mouseDownPos.y = event.screenY;
@@ -119,7 +120,7 @@ export class GameStarter {
     /**
      * 포인터 이동 이벤트 처리
      */
-    onPointerMove(event: PointerEvent) {
+    onPointerMove(event) {
 
         if( this.pickSphere ) {
             // ray 계산
@@ -145,7 +146,7 @@ export class GameStarter {
      * 포인터 업 이벤트
      * @param event 포인터 이벤트
      */
-    onPointerUp(event: PointerEvent) {
+    onPointerUp(event) {
 
         if( event.button === 0 ) {
 

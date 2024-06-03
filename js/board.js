@@ -1,23 +1,16 @@
-import { Scene, BoxBufferGeometry, MeshPhongMaterial, Mesh, Raycaster, Object3D, MeshBasicMaterial, Camera, Box3, Sphere, Vector3, Plane, Math as THREEMATH } from "three";
-import { ModelManager } from './model';
+import { BoxGeometry, MeshPhongMaterial, Mesh, MeshBasicMaterial, Box3, Sphere, Vector3, Plane, MathUtils as THREEMATH } from "three";
 import * as TWEEN from '@tweenjs/tween.js';
-import { OrbitControls, MapControls } from "three/examples/jsm/controls/OrbitControls";
-import { ScoreManager } from "./score";
-import { SoundManager } from "./soundManager";
-import { TileHolder } from "./tileHolder";
-import { GameStarter } from "./gameStarter";
-import { GameTimer } from "./gameTimer";
 
 /**
  * 타일 요소
  */
 export class Tile {
-    public object: Mesh;
-    public tileW: number;
-    public tileH: number;
-    public level: number;
+    object
+    tileW
+    tileH
+    level
 
-    constructor(w: number, h: number, level: number) {
+    constructor(w, h, level) {
 
         this.tileW = w;
         this.tileH = h;
@@ -29,10 +22,10 @@ export class Tile {
  * 타일 방향
  */
 class TileFacingAngleData {
-    public direction: Vector3;
-    public angle: number;
+    direction;
+    angle;
 
-    constructor(dir: Vector3, angle: number) {
+    constructor(dir, angle) {
         this.direction = dir.clone();
         this.angle = angle;
     }
@@ -43,37 +36,37 @@ class TileFacingAngleData {
  */
 export class Board {
 
-    private scene: Scene;
-    private modelMgr: ModelManager;
-    private camera: Camera;
-    private camControl: OrbitControls;
-    private tileSize: number;
-    private map: Tile[][];
-    private plateBase: Mesh;
-    private prevPickPlate: Object3D;
-    private matSelect: MeshPhongMaterial;
-    private matNormal: MeshPhongMaterial;
-    private curtain: Mesh;
-    private scoreMgr: ScoreManager;
-    private soundMgr: SoundManager;
-    private tileHolder: TileHolder;
+    scene;
+    modelMgr;
+    camera;
+    camControl;
+    tileSize;
+    map;
+    plateBase;
+    prevPickPlate;
+    matSelect;
+    matNormal;
+    curtain;
+    scoreMgr;
+    soundMgr;
+    tileHolder;
     
-    public pickPlates: Mesh[];
-    public floorPlates: Mesh[];
-    public mapWidth: number;
-    public mapHeight: number;
-    public boardBounding: Box3;
+    pickPlates
+    floorPlates;
+    mapWidth;
+    mapHeight;
+    boardBounding;
 
-    public isTileFacingToCamera: boolean;
-    private tileFacingAngleArray: TileFacingAngleData[];
-    private prevFacingIndex: number;
-    private gameStarter: GameStarter;
-    private gameTimer: GameTimer;
+    isTileFacingToCamera;
+    tileFacingAngleArray;
+    prevFacingIndex;
+    gameStarter;
+    gameTimer;
 
     /**
      * 생성자
      */
-    constructor(scene: Scene, modelMgr: ModelManager, camera: Camera, camControl: OrbitControls, scoreMgr: ScoreManager, soundMgr: SoundManager, gameTimer: GameTimer) {
+    constructor(scene, modelMgr, camera, camControl, scoreMgr, soundMgr, gameTimer) {
 
         this.scene = scene;
         this.modelMgr = modelMgr;
@@ -103,7 +96,7 @@ export class Board {
 
         
         // 픽킹용 바닥판
-        const geometry = new BoxBufferGeometry(this.tileSize, 1, this.tileSize, 1, 1, 1);
+        const geometry = new BoxGeometry(this.tileSize, 1, this.tileSize, 1, 1, 1);
         const material = new MeshBasicMaterial();
         this.plateBase = new Mesh(geometry, material);
         
@@ -158,7 +151,7 @@ export class Board {
         if( this.curtain ) {
             this.scene.remove(this.curtain);
             this.curtain.geometry.dispose();
-            (<MeshPhongMaterial>this.curtain.material).dispose();
+            (this.curtain.material).dispose();
             this.curtain = null;
         }
 
@@ -170,7 +163,7 @@ export class Board {
      * @param width 맵 가로 타일개수
      * @param height 맵 세로 타일개수
      */
-    createMap(width: number, height: number) {
+    createMap(width, height) {
         this.dispose();
 
         this.mapWidth = width;
@@ -270,7 +263,7 @@ export class Board {
         const boundingSize = new Vector3(), boundingCenter = new Vector3();
         bounding.getSize(boundingSize);
         bounding.getCenter(boundingCenter);
-        const curtainGeometry = new BoxBufferGeometry(boundingSize.x, curtainHeight, boundingSize.z);
+        const curtainGeometry = new BoxGeometry(boundingSize.x, curtainHeight, boundingSize.z);
         const curtainMaterial = new MeshPhongMaterial({ 
             color: 0xcccccc 
         });
@@ -287,7 +280,7 @@ export class Board {
     /**
      * w,h에 매칭되는 타일 레벨 반환
      */
-    findMatchedLevel(w: number, h: number, levelStorageTile: any): number {
+    findMatchedLevel(w, h, levelStorageTile) {
 
         let result = 0;
 
@@ -307,7 +300,7 @@ export class Board {
      * @param tile 타일 객체
      * @param comboRatio 콤보 배율
      */
-    checkTriple(tile: Tile, comboRatio: number) {
+    checkTriple(tile, comboRatio) {
 
         if( tile.level === 0 ) {
             return;
@@ -428,7 +421,7 @@ export class Board {
                         levelUpTileSource.position.copy(matched[i].object.position);
                         // 제거하면서 점수 처리
                         this.scoreMgr.addScore(matched[i], comboRatio);
-                        this.deleteTileObject(<Mesh>matched[i].object, tile, () =>{
+                        this.deleteTileObject(matched[i].object, tile, () =>{
                             // 대상타일 제거가 완료되면 레벨업 타일을 생성
                             levelUpTileSource.position.y = -30;
                             this.scene.add(levelUpTileSource);
@@ -457,7 +450,7 @@ export class Board {
 
                         // 제거하면서 점수 처리
                         this.scoreMgr.addScore(matched[i], comboRatio);
-                        this.deleteTileObject(<Mesh>matched[i].object, tile);
+                        this.deleteTileObject(matched[i].object, tile);
                         matched[i].object = emptyTile;
                         matched[i].level = 0;
                     }
@@ -473,7 +466,7 @@ export class Board {
 
                     // 제거하면서 점수 처리
                     this.scoreMgr.addScore(matched[i], comboRatio);
-                    this.deleteTileObject(<Mesh>matched[i].object, tile);
+                    this.deleteTileObject(matched[i].object, tile);
                     matched[i].object = emptyTile;
                     matched[i].level = 0;
                 }
@@ -486,7 +479,7 @@ export class Board {
      * @param target 제거 대상
      * @param tile 애니메이션 목표 대상 타일
      */
-    deleteTileObject(target: Mesh, tile: Tile, onComplete?: Function) {
+    deleteTileObject(target, tile, onComplete) {
 
         // 투명 처리를 할것이므로 재질을 복제처리한다.
         if (target.material instanceof Array) {
@@ -545,7 +538,7 @@ export class Board {
     /**
      * 보드판 업데이트 처리
      */
-    update(deltaTime: number) {
+    update(deltaTime) {
 
         if( this.isTileFacingToCamera ) {
 
@@ -599,14 +592,14 @@ export class Board {
     /**
      * 타일홀더 인스턴스 설정
      */
-    setTileHolder(holder: TileHolder) {
+    setTileHolder(holder) {
         this.tileHolder = holder;
     }
 
     /**
      * 게임 스타터 인스턴스 설정
      */
-    setGameStarter(starter: GameStarter) {
+    setGameStarter(starter) {
         this.gameStarter = starter;
     }
 
@@ -614,7 +607,7 @@ export class Board {
      * 지정된 레벨에 해당하는 타일 개수 반환
      * @param level 타일레벨
      */
-    getTileCountByLevel(level: number): number {
+    getTileCountByLevel(level) {
         
         let count = 0;
         for(let w = 0; w < this.mapWidth; w++) {
