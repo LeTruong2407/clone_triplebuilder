@@ -61,6 +61,7 @@ export class Core {
 
         // 씬객체
         this.scene = new Scene();
+
         //this.scene.background = new Color(0xcccccc);
         const textureLoader = new TextureLoader();
         const texture = textureLoader.load('./grass.jpg');
@@ -78,7 +79,6 @@ export class Core {
         this.dirLight.position.set(1, 1.75, -1);
         this.dirLight.position.multiplyScalar(30);
         this.scene.add(this.dirLight);
-
         const shadowMapDist = 100;
         this.dirLight.castShadow = true;
         this.dirLight.shadow.mapSize.width = 1024;
