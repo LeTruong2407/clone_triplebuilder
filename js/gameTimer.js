@@ -13,26 +13,26 @@ export class GameTimer {
     control;
 
     fontData;
-    geometries;
-    sharedMaterial;
-    longestInterval;
+    gameTime
     remainTime;
     timeCheck;
-    rootGroup;
     gameLogic;
     sphere;
     isPlaying;
     gameOverText;
+    timerUI;
 
     /**
      * 생성자
      */
-    constructor(scene, camera, control) {
+    constructor(scene, camera, control, gameTime, timerUI) {
 
         this.scene = scene;
         this.camera = camera;
         this.control = control;
-        this.remainTime = 5;
+        this.gameTime = gameTime;
+        this.remainTime = gameTime;
+        this.timerUI = timerUI;
         this.timeCheck = 0;
         this.isPlaying = false;
 
@@ -40,42 +40,8 @@ export class GameTimer {
         const fontLoader = new FontLoader();
         this.fontData = fontLoader.parse(FontData_Bold_Italic);
 
-        // geometry 생성
-        this.longestInterval = 0;
-        this.geometries = {};
-        const textList = ['Time:', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ];
-        textList.forEach( (text, i) =>{
-            const geometry = new TextGeometry(text, {
-                font: this.fontData,
-                size: 2.5,
-                depth: 2
-            });
-
-            // geometry의 바운딩을 계산하여 중점으로 이동
-            geometry.computeBoundingBox();
-            const size = new Vector3();
-            geometry.boundingBox.getSize(size);
-            geometry.translate( size.x * -0.5, size.y * -0.5, size.z * -0.5 );
-
-            this.geometries[text] = geometry;
-            if( 0 < i ) {
-                this.longestInterval = Math.max(this.longestInterval, size.x);
-            }
-        });
-
-        // 공유재질
-        this.sharedMaterial = new MeshPhongMaterial({
-            color: 0x00ff00,
-            specular: 0x00ff00,
-            shininess: 100
-        });
-
-        // 루트 그룹
-        this.rootGroup = new Group();
-        this.scene.add(this.rootGroup);
-
         // 시간표시 가시화 객체 업데이트
-        this.updateTimeMesh();
+        this.timerUI.textContent = this.remainTime.toString()
 
         this.initGameOverText();
     }
@@ -108,65 +74,6 @@ export class GameTimer {
     }
 
     /**
-     * 시간표시 가시화 객체 업데이트
-     */
-    updateTimeMesh() {
-
-        // 이전 가시화 객체 제거
-        const childCount = this.rootGroup.children.length;
-        for(let c = 0; c < childCount; c++) {
-            const child = this.rootGroup.children[0];
-            this.rootGroup.remove(child);
-        }
-
-        // 'Time:' 객체
-        let mesh = new Mesh(this.geometries['Time:'], this.sharedMaterial);
-        this.rootGroup.add(mesh);
-        mesh.position.set(0, 0, 0);
-
-        // Time 바운딩 계산
-        const bBox = this.geometries['Time:'].boundingBox.clone();
-        const center = new Vector3(), size = new Vector3();
-        bBox.getCenter(center);
-        bBox.getSize(size);
-
-        // 공백처리
-        const whiteSpace = new Vector3();
-        this.geometries['0'].boundingBox.getSize(whiteSpace);
-
-        // 남은 시간을 문자화하고 0번째부터 n번째까지 가시화 객체로 생성
-        const strTime = this.remainTime.toString();
-        for(let i = 0; i < strTime.length; i++) {
-
-            // 생성
-            mesh = new Mesh(this.geometries[strTime[i]], this.sharedMaterial);
-            this.rootGroup.add(mesh);
-
-            // 위치 설정
-            mesh.position.x = center.x + (size.x * 0.5) + whiteSpace.x + (this.longestInterval * i);
-        
-            bBox.expandByObject(mesh);
-        }
-
-        // 위치 조정
-        let minX = Number.MAX_VALUE, maxX = Number.MIN_VALUE, halfX = null;
-        for(let i = 1; i < this.rootGroup.children.length; i++) {
-            const child = this.rootGroup.children[i];
-            
-            const currBox = child.geometry.boundingBox.clone();
-            currBox.translate(child.position);
-            
-            minX = Math.min(minX, currBox.min.x);
-            maxX = Math.max(maxX, currBox.max.x);
-        }
-        halfX = (maxX - minX) * 0.5;
-        for(let i = 0; i < this.rootGroup.children.length; i++) {
-            const child = this.rootGroup.children[i];
-            child.translateX(-halfX);
-        }
-    }
-
-    /**
      * 업데이트
      */
     update(deltaTime) {
@@ -188,9 +95,6 @@ export class GameTimer {
             result.addScaledVector(direction, this.sphere.radius + 10);
             result.y -= 2.5;
 
-            this.rootGroup.position.copy(result);
-            this.rootGroup.lookAt(this.control.target);
-
             if( this.isPlaying ) {
                 this.timeCheck += deltaTime;
                 if( this.timeCheck >= 1.0 ) {
@@ -198,20 +102,11 @@ export class GameTimer {
     
                     this.remainTime--;
                     if( this.remainTime >= 0 ) {
-                        this.updateTimeMesh();
+                        this.timerUI.textContent = this.remainTime.toString()
                     } else {
                         // 게임 오버 처리
                         this.isPlaying = false;
                         this.gameLogic.doGameOver();
-                    }
-
-                    // 시간 색상 처리
-                    if( this.remainTime <= 30 ) {
-                        this.sharedMaterial.color = new Color(0xff0000);
-                    } else if( this.remainTime <= 60 ) {
-                        this.sharedMaterial.color = new Color(0xffad3a);
-                    } else {
-                        this.sharedMaterial.color = new Color(0x00ff00);
                     }
                 }
             }
@@ -222,13 +117,6 @@ export class GameTimer {
                 this.gameOverText.lookAt(this.control.target);
             }
         }
-    }
-
-    /**
-     * 가시화 설정
-     */
-    setVisible(isVisible) {
-        this.rootGroup.visible = isVisible;
     }
 
     /**
@@ -243,7 +131,7 @@ export class GameTimer {
      */
     reset() {
         this.isPlaying = true;
-        this.remainTime = 300;
+        this.remainTime = this.gameTime + 1;
         this.timeCheck = 0;
         this.gameOverText.visible = false;
     }

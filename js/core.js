@@ -37,7 +37,10 @@ export class Core {
     soundMgr;
     tileHolder;
     gameStarter;
+    gameTime;
+    timerUI
     gameTimer;
+
 
     // Máy bay
     aircraft;
@@ -45,11 +48,13 @@ export class Core {
     /**
      * 생성자
      */
-    constructor(onReady, scoreUI, highscoreUI) {
+    constructor(onReady, scoreUI, highscoreUI, timerUI, gameTime) {
         
         this.clock = new Clock();
         this.scoreUI = scoreUI
         this.highscoreUI = highscoreUI
+        this.timerUI = timerUI
+        this.gameTime = gameTime
 
         // 렌더러 생성
         this.renderer = new WebGLRenderer({
@@ -115,9 +120,9 @@ export class Core {
 
         const scope = this;
         this.model = new ModelManager(this.scene, function(){
-            scope.gameTimer = new GameTimer(scope.scene, scope.camera, scope.control);
+            scope.gameTimer = new GameTimer(scope.scene, scope.camera, scope.control, scope.gameTime, scope.timerUI);
             scope.soundMgr = new SoundManager(scope.camera);
-            scope.scoreMgr = new ScoreManager(scope.scene, scope.camera, scope.control, scope.scoreUI, highscoreUI);
+            scope.scoreMgr = new ScoreManager(scope.scene, scope.camera, scope.control, scope.scoreUI, scope.highscoreUI);
             scope.board = new Board(scope.scene, scope.model, scope.camera, scope.control, scope.scoreMgr, scope.soundMgr, scope.gameTimer);
             scope.gameLogic = new GameLogic(scope.scene, scope.camera, scope.control, scope.board, scope.model, scope.scoreMgr, scope.soundMgr, scope.gameTimer);
             scope.tileHolder = new TileHolder(scope.scene, scope.camera, scope.control, scope.model);
@@ -125,14 +130,12 @@ export class Core {
             scope.board.setTileHolder(scope.tileHolder);
 
             scope.tileHolder.setVisible(false);
-            scope.gameTimer.setVisible(false);
             scope.gameTimer.setGameLogic(scope.gameLogic);
 
             scope.gameStarter = new GameStarter(scope.scene, scope.camera, scope.control, () => {
                 scope.control.autoRotate = false;
                 scope.control.enabled = true;
                 scope.tileHolder.setVisible(true);
-                scope.gameTimer.setVisible(true);
                 scope.gameTimer.isPlaying = true;
                 scope.soundMgr.playSound('BGM');
                 scope.gameLogic.createCursor();

@@ -13,3 +13,8 @@ body {
 h1.score {
   color: blue;
 }
+
+h1.clock {
+  color: green;
+  position: relative;
+}
