@@ -27,15 +27,8 @@ export class ScoreManager {
     scoreUI
 
     sphere;
-
-    resultScoreRoot;
-    resultScoreSharedMaterial;
-    resultScoreInterval;
     
-    highScoreRoot;
     highScore;
-    highScoreGeometries;
-    highScoreInterval;
     highScoreUI
 
     /**
@@ -60,6 +53,8 @@ export class ScoreManager {
             this.highScore = parseInt(storageHighScore);
         }
 
+        this.highScoreUI.textContent = this.highScore.toString()
+
         // 점수 테이블, 총 타일레벨은 10이지만 0레벨은 점수가 없으므로 9개만 세팅
         this.scoreTable = [];
         this.scoreTable.push(5);
@@ -79,27 +74,6 @@ export class ScoreManager {
 
         // 사용할 텍스트 Geometry를 미리 생성해 놓는다.
         // 점수표시용
-        this.resultScoreInterval = 0;
-        const textList = [ 'Score:', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ];
-        this.geometries = {};
-        textList.forEach( (text, i) => {
-            const geometry = new TextGeometry(text, {
-                font: this.fontData,
-                size: 10,
-                depth: 2
-            });
-
-            // geometry의 바운딩을 계산하여 중점으로 이동
-            geometry.computeBoundingBox();
-            const size = new Vector3();
-            geometry.boundingBox.getSize(size);
-            geometry.translate( size.x * -0.5, size.y * -0.5, size.z * -0.5 );
-
-            this.geometries[text] = geometry;
-            if( 0 < i ) {
-                this.resultScoreInterval = Math.max(this.resultScoreInterval, size.x);
-            }
-        });
         
         // 팝업 점수용
         const popupTextList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'x'];
@@ -135,41 +109,6 @@ export class ScoreManager {
 
         // 팝업 객체 리스트
         this.popupObjList = [];
-
-        // 누적점수
-        this.resultScoreSharedMaterial = new MeshPhongMaterial({ color: 0x0000ff });
-        this.resultScoreRoot = new Group();
-        this.scene.add(this.resultScoreRoot);
-        this.updateScoreMesh();
-
-        // 하이스코어
-        this.highScoreRoot = new Group();
-        this.scene.add(this.highScoreRoot);
-
-        this.highScoreInterval = 0;
-        const highScoreTextList = ['HighScore:', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        this.highScoreGeometries = {};
-        highScoreTextList.forEach( (text, i) => {
-            const geometry = new TextGeometry(text, {
-                font: this.fontData,
-                size: 3,
-                depth: 2
-            });
-
-            // geometry의 바운딩을 계산하여 중점으로 이동
-            geometry.computeBoundingBox();
-            const size = new Vector3();
-            geometry.boundingBox.getSize(size);
-            geometry.translate( size.x * -0.5, size.y * -0.5, size.z * -0.5 );
-
-            this.highScoreGeometries[text] = geometry;
-            if( 0 < i ) { // 문자 간격을 제일 큰 문자를 기준으로 처리
-                this.highScoreInterval = Math.max( this.highScoreInterval, size.x );
-            }
-        });
-        this.updateHighScoreMesh();
-
-        
     }
 
     /**
@@ -178,7 +117,6 @@ export class ScoreManager {
     reset() {
 
         this.score = 0;
-
     }
 
     /**
@@ -188,8 +126,7 @@ export class ScoreManager {
     setScore(score) {
         
         this.score = score;
-        this.scoreUI.textContent() = this.score.toString()
-        this.updateScoreMesh();
+        this.scoreUI.textContent = this.score.toString()
     }
 
     /**
@@ -236,133 +173,15 @@ export class ScoreManager {
             const popup = new ScorePopup(this.scene, geometryArray, this.sharedPopupMaterial, spawnLocation);
             this.popupObjList.push(popup);
 
-            this.updateScoreMesh();
+            // this.updateScoreMesh();
             this.scoreUI.textContent = this.score.toString()
             if( this.score >= this.highScore ) {
                 this.highScore = this.score;
                 this.saveHighScore();
-                this.updateHighScoreMesh();
             }
         }
     }
 
-    /**
-     * 누적점수 가시화 객체를 업데이트 한다.
-     */
-    updateScoreMesh() {
-
-        // 이전 자식 객체 제거
-        const childCount = this.resultScoreRoot.children.length;
-        for(let i = 0; i < childCount; i++) {
-            const child = this.resultScoreRoot.children[0];
-            this.resultScoreRoot.remove(child);
-        }
-
-        // Score 객체 추가
-        let mesh = new Mesh(this.geometries['Score:'], this.resultScoreSharedMaterial);
-        this.resultScoreRoot.add(mesh);
-        mesh.position.set(0, 0, 0);
-
-        // Score 바운딩 계산
-        const bBox = this.geometries['Score:'].boundingBox.clone();
-        const scoreCenter = new Vector3(), scoreSize = new Vector3();
-        bBox.getCenter(scoreCenter);
-        bBox.getSize(scoreSize);
-
-        // 시작지점 공백용사이즈를 '0'으로 계산
-        const whiteSpaceSize = new Vector3();
-        this.geometries['0'].boundingBox.getSize(whiteSpaceSize);
-
-        // 점수 문자화를 하고 0번쨰부터 n번째까지 가시화 객체로 생성한다.
-        const strScore = this.score.toString();
-        for(let i = 0; i < strScore.length; i++) {
-
-            // 생성
-            mesh = new Mesh(this.geometries[strScore[i]], this.resultScoreSharedMaterial);
-            this.resultScoreRoot.add(mesh);
-
-            // 위치 설정
-            mesh.position.x = scoreCenter.x + (scoreSize.x * 0.5) + whiteSpaceSize.x + (this.resultScoreInterval * i);
-            bBox.expandByObject(mesh);
-        }
-
-        // 위치 조정
-        let minX = Number.MAX_VALUE, maxX = Number.MIN_VALUE, halfX = null;
-        for(let i = 1; i < this.resultScoreRoot.children.length; i++) {
-            const child = this.resultScoreRoot.children[i];
-            
-            const currBox = child.geometry.boundingBox.clone();
-            currBox.translate(child.position);
-            
-            minX = Math.min(minX, currBox.min.x);
-            maxX = Math.max(maxX, currBox.max.x);
-        }
-        halfX = (maxX - minX) * 0.5;
-        for(let i = 0; i < this.resultScoreRoot.children.length; i++) {
-            const child = this.resultScoreRoot.children[i];
-            child.translateX(-halfX);
-        }
-    }
-
-    /**
-     * 최대점수 가시화 객체를 업데이트 한다.
-     */
-    updateHighScoreMesh() {
-
-        // 이전 자식 객체 제거
-        const childCount = this.highScoreRoot.children.length;
-        for(let i = 0; i < childCount; i++) {
-            const child = this.highScoreRoot.children[0];
-            this.highScoreRoot.remove(child);
-        }
-
-        // Highscore 객체
-        let mesh = new Mesh( this.highScoreGeometries['HighScore:'], this.resultScoreSharedMaterial);
-        this.highScoreRoot.add(mesh);
-        mesh.position.set(0, 0, 0);
-
-        // highscore 바운딩 계산
-        const bBox = this.highScoreGeometries['HighScore:'].boundingBox.clone();
-        const scoreCenter = new Vector3(), scoreSize = new Vector3();
-        bBox.getCenter(scoreCenter);
-        bBox.getSize(scoreSize);
-
-        // 시작지점 공백용사이즈를 '0'으로 계산
-        const whiteSpaceSize = new Vector3();
-        this.highScoreGeometries['0'].boundingBox.getSize(whiteSpaceSize);
-
-        // 점수 문자화를 하고 0번쨰부터 n번째까지 가시화 객체로 생성한다.
-        const strScore = this.highScore.toString();
-        for(let i = 0; i < strScore.length; i++) {
-
-            // 생성
-            mesh = new Mesh(this.highScoreGeometries[strScore[i]], this.resultScoreSharedMaterial);
-            this.highScoreRoot.add(mesh);
-
-            // 위치 설정
-            mesh.position.x = scoreCenter.x + (scoreSize.x * 0.5) + whiteSpaceSize.x + (this.highScoreInterval * i);
-            mesh.position.y -= 1;
-            bBox.expandByObject(mesh);
-        }
-
-        // 위치 조정
-        let minX = Number.MAX_VALUE, maxX = Number.MIN_VALUE, halfX = null;
-        for(let i = 1; i < this.highScoreRoot.children.length; i++) {
-            const child = this.highScoreRoot.children[i];
-            
-            const currBox = child.geometry.boundingBox.clone();
-            currBox.translate(child.position);
-            
-            minX = Math.min(minX, currBox.min.x);
-            maxX = Math.max(maxX, currBox.max.x);
-        }
-        halfX = (maxX - minX) * 0.5;
-        for(let i = 0; i < this.highScoreRoot.children.length; i++) {
-            const child = this.highScoreRoot.children[i];
-            child.translateX(-halfX);
-        }
-
-    }
 
     /**
      * 업데이트
@@ -386,13 +205,6 @@ export class ScoreManager {
             const result = this.control.target.clone();
             result.addScaledVector(direction, this.sphere.radius + 10);
             result.y += 10;
-
-            this.resultScoreRoot.position.copy(result);
-            this.resultScoreRoot.lookAt(this.control.target);
-
-            this.highScoreRoot.position.copy(result);
-            this.highScoreRoot.position.y -= 8;
-            this.highScoreRoot.lookAt(this.control.target);
         }
 
         // 팝업 객체리스트를 역순으로 순회하며 애니메이션이 완료된 객체는 제거한다.
@@ -403,15 +215,6 @@ export class ScoreManager {
                 this.popupObjList.splice(i, 1);
             }
         }
-    }
-
-    /**
-     * 가시화 설정
-     * @param isVisible 가시화 여부
-     */
-    setVisible(isVisible) {
-        this.resultScoreRoot.visible = isVisible;
-        this.highScoreRoot.visible = isVisible;
     }
     
     /**

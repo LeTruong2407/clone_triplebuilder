@@ -1,4 +1,4 @@
-import { BoxGeometry, MeshPhongMaterial, Mesh, MeshBasicMaterial, Box3, Sphere, Vector3, Plane, MathUtils as THREEMATH } from "three";
+import { BoxGeometry, MeshPhongMaterial, Mesh,Vector2, MeshBasicMaterial, Box3, Sphere, Vector3, TextureLoader, Plane, MathUtils as THREEMATH } from "three";
 import * as TWEEN from '@tweenjs/tween.js';
 
 /**
@@ -81,7 +81,7 @@ export class Board {
         this.mapWidth = -1;
         this.mapHeight = -1;
         this.prevPickPlate = null;
-        this.matSelect = new MeshPhongMaterial({color: 0xffff00});
+        this.matSelect = new MeshPhongMaterial({color: 0xff0000 });
         this.matNormal = new MeshPhongMaterial({color: 0xcccccc});
         this.boardBounding = new Box3().makeEmpty();
 
@@ -96,10 +96,11 @@ export class Board {
 
         
         // 픽킹용 바닥판
+        // 픽킹용 바닥판
         const geometry = new BoxGeometry(this.tileSize, 1, this.tileSize, 1, 1, 1);
         const material = new MeshBasicMaterial();
         this.plateBase = new Mesh(geometry, material);
-        
+      
     }
 
     /**
@@ -265,7 +266,7 @@ export class Board {
         bounding.getCenter(boundingCenter);
         const curtainGeometry = new BoxGeometry(boundingSize.x, curtainHeight, boundingSize.z);
         const curtainMaterial = new MeshPhongMaterial({ 
-            color: 0xcccccc 
+            color: 0x7B5E3C 
         });
         this.curtain = new Mesh(curtainGeometry, curtainMaterial);
         this.curtain.position.x = boundingCenter.x;

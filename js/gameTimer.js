@@ -32,7 +32,7 @@ export class GameTimer {
         this.scene = scene;
         this.camera = camera;
         this.control = control;
-        this.remainTime = 300;
+        this.remainTime = 5;
         this.timeCheck = 0;
         this.isPlaying = false;
 
