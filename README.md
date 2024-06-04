@@ -1,4 +1,4 @@
-# This is clone repo from: https://github.com/Ozymandias1/triplebuilder/tree/master
+# This project uses some code in this repo: https://github.com/Ozymandias1/triplebuilder/tree/master
 # triplebuilder
 Triple Builder is a three-match puzzle game inspired by Triple Town.
 
@@ -11,14 +11,8 @@ When build a building, if you have a same levels on two buildings on the right, 
 
 # how to run
 1. clone repository
-2. open terminal and go to 'triplebuilder_app' directory.
-3. type <code>npm install</code>
-4. run <code>startServer.bat</code>
-5. open browser and connect <code>http://localhost:8080</code>
-
-# screenshots
-![gameplay01](./screenshot1.gif)
-![gameplay02](./screenshot2.gif)
+2. type <code>npm install</code>
+3. run <code>npx vite</code>
 
 # license info
 - Sound: DayAndNight (https://opengameart.org/content/day-night-in-summerset)
