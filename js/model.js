@@ -21,12 +21,12 @@ export class ModelManager {
         // 건물 타일 로드
         const scope = this;
         new MTLLoader().load(
-            'models/buildings/buildingtiles.mtl',
+            'assets/models/buildings/buildingtiles.mtl',
             function( materials ) {
                 materials.preload();
 
                 new OBJLoader().setMaterials(materials).load(
-                    'models/buildings/buildingtiles.obj',
+                    'assets/models/buildings/buildingtiles.obj',
                     function(object) {
                         
                         // 객체 그림자 On

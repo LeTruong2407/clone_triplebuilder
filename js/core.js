@@ -77,7 +77,7 @@ export class Core {
         const backgroundTexturePath = "./textures/grassbump.jpg"
         const textureLoader = new TextureLoader();
         const backgroundTexture = textureLoader.load(backgroundTexturePath);
-        this.scene.background = new Color("rgp(255, 255, 255)");
+        this.scene.background = new Color("rgb(255, 255, 255)");
 
 
         this.hemiLight = new HemisphereLight(0xffffff, 0xffffff, 2.5);
@@ -148,8 +148,8 @@ export class Core {
             });
             scope.board.setGameStarter(scope.gameStarter);
 
-            scope.loadAircraft("models/aircraft/aircraft.mtl", "models/aircraft/aircraft.obj");
-            scope.loadBugatti1Model("models/bugatti/bugatti.mtl", "models/bugatti/bugatti.obj");
+            scope.loadAircraft("assets/models/aircraft/aircraft.mtl", "assets/models/aircraft/aircraft.obj");
+            scope.loadBugatti1Model("assets/models/bugatti/bugatti.mtl", "assets/models/bugatti/bugatti.obj");
             scope.loadBugatti2Model();
 
             if (onReady) {
@@ -357,12 +357,12 @@ export class Core {
     
         const mtlLoader = new MTLLoader();
         mtlLoader.load(
-            'models/bugatti/bugatti.mtl', 
+            'assets/models/bugatti/bugatti.mtl', 
             function(materials) {
                 const objLoader = new OBJLoader();
                 objLoader.setMaterials(materials);
                 objLoader.load(
-                    'models/bugatti/bugatti.obj', 
+                    'assets/models/bugatti/bugatti.obj', 
                     function(object) {
                         object.position.set(-3, 0.29, 45);
                         object.rotation.set(0, -4.75, 0);

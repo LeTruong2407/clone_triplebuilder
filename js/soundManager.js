@@ -24,7 +24,7 @@ export class SoundManager {
         this.sounds = {};
         const audioLoader = new AudioLoader();
         // 배경음악
-        audioLoader.load('sounds/BGM.wav', (buffer) =>{
+        audioLoader.load('assets/sounds/BGM.wav', (buffer) =>{
             
             const sound = new Audio(scope.listener);
             sound.setBuffer(buffer);
@@ -37,7 +37,7 @@ export class SoundManager {
             console.error(err);
         });
         // 건물 생성
-        audioLoader.load('sounds/CreateBuilding.wav', (buffer) =>{
+        audioLoader.load('assets/sounds/CreateBuilding.wav', (buffer) =>{
             
             const sound = new Audio(scope.listener);
             sound.setBuffer(buffer);
@@ -50,7 +50,7 @@ export class SoundManager {
             console.error(err);
         });
         // 스코어취득
-        audioLoader.load('sounds/Score.wav', (buffer) =>{
+        audioLoader.load('assets/sounds/Score.wav', (buffer) =>{
             
             const sound = new Audio(scope.listener);
             sound.setBuffer(buffer);
