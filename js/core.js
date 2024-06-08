@@ -12,6 +12,7 @@ import { GameStarter } from './gameStarter.js';
 import { GameTimer } from './gameTimer.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { color } from 'three/examples/jsm/nodes/Nodes.js';
 
 /**
  * 엔진 코어
@@ -40,6 +41,7 @@ export class Core {
     gameTime;
     timerUI
     gameTimer;
+    texturePath;
 
 
     // Máy bay
@@ -48,13 +50,14 @@ export class Core {
     /**
      * 생성자
      */
-    constructor(onReady, scoreUI, highscoreUI, timerUI, gameTime) {
+    constructor(onReady, scoreUI, highscoreUI, timerUI, gameTime, texturePath) {
         
         this.clock = new Clock();
         this.scoreUI = scoreUI
         this.highscoreUI = highscoreUI
         this.timerUI = timerUI
         this.gameTime = gameTime
+        this.texturePath = texturePath
 
         // 렌더러 생성
         this.renderer = new WebGLRenderer({
@@ -71,27 +74,28 @@ export class Core {
         // 씬객체
         this.scene = new Scene();
 
-        //this.scene.background = new Color(0xcccccc);
+        const backgroundTexturePath = "./textures/grassbump.jpg"
         const textureLoader = new TextureLoader();
-        const texture = textureLoader.load('./grass.jpg');
-        this.scene.background = texture;
+        const backgroundTexture = textureLoader.load(backgroundTexturePath);
+        this.scene.background = new Color("rgp(255, 255, 255)");
 
 
-        this.hemiLight = new HemisphereLight(0xffffff, 0xffffff, 5);
-        this.hemiLight.color.setHSL(0.6, 1, 0.6);
-        this.hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+        this.hemiLight = new HemisphereLight(0xffffff, 0xffffff, 2.5);
+        this.hemiLight.color.setRGB(1, 1, 1)
+        this.hemiLight.groundColor.setRGB(1, 1, 1)
         this.hemiLight.position.set(0, 50, 0);
         this.scene.add(this.hemiLight);
         
-        this.dirLight = new DirectionalLight(0xffffff, 4);
-        this.dirLight.color.setHSL(0.1, 1, 0.95);
-        this.dirLight.position.set(1, 1.75, -1);
+        this.dirLight = new DirectionalLight(0xffffff, 2.5);
+        this.dirLight.color.setRGB(1, 1, 1);
+        this.dirLight.position.set(1, 1.75, 1.5);
         this.dirLight.position.multiplyScalar(30);
         this.scene.add(this.dirLight);
-        const shadowMapDist = 100;
+        const shadowMapDist = 150;
+        const solution = 2048;
         this.dirLight.castShadow = true;
-        this.dirLight.shadow.mapSize.width = 1024;
-        this.dirLight.shadow.mapSize.height = 1024;
+        this.dirLight.shadow.mapSize.width = solution;
+        this.dirLight.shadow.mapSize.height = solution;
         this.dirLight.shadow.camera.left = -shadowMapDist;
         this.dirLight.shadow.camera.right = shadowMapDist;
         this.dirLight.shadow.camera.top = shadowMapDist;
@@ -123,7 +127,8 @@ export class Core {
             scope.gameTimer = new GameTimer(scope.scene, scope.camera, scope.control, scope.gameTime, scope.timerUI);
             scope.soundMgr = new SoundManager(scope.camera);
             scope.scoreMgr = new ScoreManager(scope.scene, scope.camera, scope.control, scope.scoreUI, scope.highscoreUI);
-            scope.board = new Board(scope.scene, scope.model, scope.camera, scope.control, scope.scoreMgr, scope.soundMgr, scope.gameTimer);
+            scope.board = new Board(scope.scene, scope.model, scope.camera, scope.control, 
+                scope.scoreMgr, scope.soundMgr, scope.gameTimer, scope.texturePath);
             scope.gameLogic = new GameLogic(scope.scene, scope.camera, scope.control, scope.board, scope.model, scope.scoreMgr, scope.soundMgr, scope.gameTimer);
             scope.tileHolder = new TileHolder(scope.scene, scope.camera, scope.control, scope.model);
             scope.gameLogic.setTileHolder(scope.tileHolder);

@@ -1,4 +1,6 @@
-import { BoxGeometry, MeshPhongMaterial, Mesh,Vector2, MeshBasicMaterial, Box3, Sphere, Vector3, TextureLoader, Plane, MathUtils as THREEMATH } from "three";
+import { BoxGeometry, MeshPhongMaterial, Mesh, 
+         MeshBasicMaterial, MeshStandardMaterial, Box3, Sphere,
+         Vector3, TextureLoader, Plane, MathUtils as THREEMATH } from "three";
 import * as TWEEN from '@tweenjs/tween.js';
 
 /**
@@ -47,6 +49,8 @@ export class Board {
     matSelect;
     matNormal;
     curtain;
+    textureLoader;
+    texturePath;
     scoreMgr;
     soundMgr;
     tileHolder;
@@ -66,7 +70,7 @@ export class Board {
     /**
      * 생성자
      */
-    constructor(scene, modelMgr, camera, camControl, scoreMgr, soundMgr, gameTimer) {
+    constructor(scene, modelMgr, camera, camControl, scoreMgr, soundMgr, gameTimer, texturePath) {
 
         this.scene = scene;
         this.modelMgr = modelMgr;
@@ -100,7 +104,8 @@ export class Board {
         const geometry = new BoxGeometry(this.tileSize, 1, this.tileSize, 1, 1, 1);
         const material = new MeshBasicMaterial();
         this.plateBase = new Mesh(geometry, material);
-      
+        this.textureLoader = new TextureLoader()
+        this.texturePath = texturePath
     }
 
     /**
@@ -265,10 +270,11 @@ export class Board {
         bounding.getSize(boundingSize);
         bounding.getCenter(boundingCenter);
         const curtainGeometry = new BoxGeometry(boundingSize.x, curtainHeight, boundingSize.z);
-        const curtainMaterial = new MeshPhongMaterial({ 
-            color: 0x7B5E3C 
-        });
+        const curtainMaterial = new MeshStandardMaterial();
         this.curtain = new Mesh(curtainGeometry, curtainMaterial);
+        this.curtain.material.map = this.textureLoader.load(this.texturePath)
+        this.curtain.material.bumpMap = this.textureLoader.load(this.texturePath)
+        this.curtain.material.bumpScale = 10
         this.curtain.position.x = boundingCenter.x;
         this.curtain.position.y = -(boundingSize.y * 0.25) - (curtainHeight * 0.5);
         this.curtain.position.z = boundingCenter.z;
