@@ -6,3 +6,5 @@ logs
 node_modules/
 .triplebuilder_src/
 .vite/
+
+trash.js

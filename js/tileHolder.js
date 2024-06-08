@@ -1,7 +1,7 @@
 import { Vector3, MeshPhongMaterial, Mesh, Sphere, Plane, Group, BoxGeometry, Box3, Object3D } from "three";
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
+import * as FontData_Bold_Italic from '../assets/fonts/Open_Sans_Bold_Italic.json';
 
 /**
  * 타일 홀딩 기능

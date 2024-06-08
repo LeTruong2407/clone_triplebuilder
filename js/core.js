@@ -1,5 +1,6 @@
-import { Clock,Box3, Vector3, Color, DirectionalLight, HemisphereLight, 
-        PCFSoftShadowMap, PerspectiveCamera, Scene, WebGLRenderer, TextureLoader, MeshBasicMaterial } from 'three';
+import { Clock, Box3, Vector3, Color, DirectionalLight, HemisphereLight, AmbientLight,
+        PCFSoftShadowMap, PerspectiveCamera, Scene, WebGLRenderer, TextureLoader, MeshBasicMaterial, 
+        Euler} from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Board } from './board.js';
 import { ModelManager } from './model.js';
@@ -12,23 +13,17 @@ import { GameStarter } from './gameStarter.js';
 import { GameTimer } from './gameTimer.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { color } from 'three/examples/jsm/nodes/Nodes.js';
 
 /**
  * 엔진 코어
  */
 export class Core {
-    // 변수
     renderer;
     scene;
     camera;
     control;
     clock;
 
-    hemiLight;
-    dirLight;
-
-    // 로직
     scoreUI
     highscoreUI
     scoreMgr;
@@ -43,23 +38,28 @@ export class Core {
     gameTimer;
     texturePath;
 
+    decorations;
+    decoration_specs;
 
-    // Máy bay
-    aircraft;
-
-    /**
-     * 생성자
-     */
     constructor(onReady, scoreUI, highscoreUI, timerUI, gameTime, texturePath) {
-        
+        const modelsPath = "./assets/models/"
         this.clock = new Clock();
         this.scoreUI = scoreUI
         this.highscoreUI = highscoreUI
         this.timerUI = timerUI
         this.gameTime = gameTime
         this.texturePath = texturePath
+        this.decorations = []
+        this.decoration_specs = []
 
-        // 렌더러 생성
+        this.decoration_specs.push({
+            startPosition: new Vector3(5, 35, 50),
+            endPosition: new Vector3(100, 35, 50),
+            initAngle: new Euler(0, 29.8, 0),
+            rotate: 90
+        })
+
+        // renderer section
         this.renderer = new WebGLRenderer({
             antialias: true
         });
@@ -71,37 +71,37 @@ export class Core {
         this.renderer.shadowMap.type = PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
-        // 씬객체
+        // scene section
         this.scene = new Scene();
 
-        const backgroundTexturePath = "./textures/grassbump.jpg"
-        const textureLoader = new TextureLoader();
-        const backgroundTexture = textureLoader.load(backgroundTexturePath);
-        this.scene.background = new Color("rgb(255, 255, 255)");
+        this.scene.background = new Color("#87CEEB");
 
+        const ambientLight = new AmbientLight(0xffffff, 3);
+        this.scene.add(ambientLight);
 
-        this.hemiLight = new HemisphereLight(0xffffff, 0xffffff, 2.5);
-        this.hemiLight.color.setRGB(1, 1, 1)
-        this.hemiLight.groundColor.setRGB(1, 1, 1)
-        this.hemiLight.position.set(0, 50, 0);
-        this.scene.add(this.hemiLight);
+        const hemiLight = new HemisphereLight(0xffffff, 0xffffff, 5);
+        hemiLight.color.setHSL(0.6, 1, 0.6);
+        hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+        hemiLight.position.set(0, 50, 0);
+        this.scene.add(hemiLight);
         
-        this.dirLight = new DirectionalLight(0xffffff, 2.5);
-        this.dirLight.color.setRGB(1, 1, 1);
-        this.dirLight.position.set(1, 1.75, 1.5);
-        this.dirLight.position.multiplyScalar(30);
-        this.scene.add(this.dirLight);
+        const dirLight = new DirectionalLight(0xff0000, 4.5);
+        dirLight.color.setHSL(0.1, 1, 0.95);
+        dirLight.position.set(1, 1.2, -1);
+        dirLight.position.multiplyScalar(500);
+        this.scene.add(dirLight);
+
         const shadowMapDist = 150;
         const solution = 2048;
-        this.dirLight.castShadow = true;
-        this.dirLight.shadow.mapSize.width = solution;
-        this.dirLight.shadow.mapSize.height = solution;
-        this.dirLight.shadow.camera.left = -shadowMapDist;
-        this.dirLight.shadow.camera.right = shadowMapDist;
-        this.dirLight.shadow.camera.top = shadowMapDist;
-        this.dirLight.shadow.camera.bottom = -shadowMapDist;
-        this.dirLight.shadow.camera.far = 3500;
-        this.dirLight.shadow.bias = -0.00001;
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = solution;
+        dirLight.shadow.mapSize.height = solution;
+        dirLight.shadow.camera.left = -shadowMapDist;
+        dirLight.shadow.camera.right = shadowMapDist;
+        dirLight.shadow.camera.top = shadowMapDist;
+        dirLight.shadow.camera.bottom = -shadowMapDist;
+        dirLight.shadow.camera.far = 3500;
+        dirLight.shadow.bias = -0.00001;
         
         this.camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.5, 1000);
         this.camera.position.set(0, 50, -50);
@@ -148,8 +148,16 @@ export class Core {
             });
             scope.board.setGameStarter(scope.gameStarter);
 
-            scope.loadAircraft("assets/models/aircraft/aircraft.mtl", "assets/models/aircraft/aircraft.obj");
-            scope.loadBugatti1Model("assets/models/bugatti/bugatti.mtl", "assets/models/bugatti/bugatti.obj");
+            
+            
+            // const car_specs = [{
+            //     startPosition: new Vector3(5, 35, 50),
+            //     endPosition: new Vector3(100, 35, 50),
+            //     initAngle: new Euler(0, 29.8, 0),
+            //     rotate: 90
+            // }]
+            scope.loadAircraft(modelsPath + "aircraft/", scope.decoration_specs[0]);
+            // scope.loadBugatti1Model("bugatti/bugatti.mtl", "bugatti/bugatti.obj");
             scope.loadBugatti2Model();
 
             if (onReady) {
@@ -160,37 +168,37 @@ export class Core {
         });
     }
 
-    loadAircraft(mtl_path, obj_path) {
+    loadAircraft(path, spec) {
         const scope = this;
     
         const mtlLoader = new MTLLoader();
         mtlLoader.load(
-            mtl_path, 
+            path + "aircraft.mtl", 
             function(materials) {
                 const objLoader = new OBJLoader();
                 objLoader.setMaterials(materials);
                 objLoader.load(
-                    obj_path, 
+                    path + "aircraft.obj", 
                     function(object) {
-                        object.position.set(5, 35, 50);
-                        object.rotation.set(0, 29.8, 0);
-                        //
-                        const box_1 = new Box3().setFromObject(object);
-                        const size_1 = box_1.getSize(new Vector3());
-                        const maxSize_1 = Math.max(size_1.x, size_1.y,size_1.y);
-                        const desizedSize_1 = 15;
-                        object.scale.multiplyScalar(desizedSize_1/maxSize_1);
-                        //
+                        object.rotation.copy(spec.initAngle)
+                                                
+                        const box = new Box3().setFromObject(object);
+                        const size = box.getSize(new Vector3());
+                        const maxSize = Math.max(size.x, size.y,size.y);
+                        const desizedSize = 15;
+                        object.scale.multiplyScalar(desizedSize/maxSize);
+                        
                         scope.scene.add(object);
-                        scope.aircraft = object; 
-
-                        scope.createAircraftAnimation();
+                        scope.decorations.push(object); 
+                        
+                        const objID = scope.decorations.length - 1
+                        scope.createAircraftAnimation(objID, 200, 2000);
                     },
                     function(xhr) {
                         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
                     },
                     function(error) {
-                        console.error('Error loading aircraft model:', error);
+                        console.error('Error loading model:', error);
                     }
                 );
             },
@@ -198,51 +206,53 @@ export class Core {
                 console.log((xhr.loaded / xhr.total * 100) + '% loaded');
             },
             function(error) {
-                console.error('Error loading plane materials:', error);
+                console.error('Error loading materials:', error);
             }
         );
     }
 
-    createAircraftAnimation() {
+    createAircraftAnimation(objID, moveSpeed, rotateSpeed) {
         const scope = this;
-        const positionStart = { x: 5, y: 35, z: 50 };
-        const positionEnd = { x: 100, y: 35, z: 50 };
+        console.log(objID)
+        console.log(scope.decoration_specs[objID])
+        const start = scope.decoration_specs[objID].startPosition;
+        const end = scope.decoration_specs[objID].endPosition;
     
-        const moveTween = new TWEEN.Tween(positionStart)
-            .to(positionEnd, 40000)
+        const moveTween = new TWEEN.Tween(start)
+            .to(end, moveSpeed)
             .easing(TWEEN.Easing.Quadratic.InOut)
             .onUpdate(() => {
-                if (scope.aircraft) {
-                    scope.aircraft.position.set(positionStart.x, positionStart.y, positionStart.z);
+                if (scope.decorations[objID]) {
+                    scope.decorations[objID].position.copy(start);
                 }
             });
     
         const rotation = { y: (270) * Math.PI / 180 };
         
         const rotateTween = new TWEEN.Tween(rotation)
-            .to({ y: (30+60) * Math.PI / 180 }, 2000)
+            .to({ y: (30+60) * Math.PI / 180 }, rotateSpeed)
             .easing(TWEEN.Easing.Quadratic.InOut)
             .onUpdate(() => {
-                if (scope.aircraft) {
-                    scope.aircraft.rotation.y = rotation.y;
+                if (scope.decorations[objID]) {
+                    scope.decorations[objID].rotation.y = rotation.y;
                 }
             });
     
-        const moveBackTween = new TWEEN.Tween(positionStart)
-            .to({ x: 5, y: 35, z: 50 }, 30000)
+        const moveBackTween = new TWEEN.Tween(start)
+            .to({ x: 5, y: 35, z: 50 }, moveSpeed)
             .easing(TWEEN.Easing.Quadratic.InOut)
             .onUpdate(() => {
-                if (scope.aircraft) {
-                    scope.aircraft.position.set(positionStart.x, positionStart.y, positionStart.z);
+                if (scope.decorations[objID]) {
+                    scope.decorations[objID].position.copy(start);
                 }
             });
     
         const rotateBackTween = new TWEEN.Tween(rotation)
-            .to({ y: (-90) * Math.PI / 180 }, 2000)
+            .to({ y: (-90) * Math.PI / 180 }, rotateSpeed)
             .easing(TWEEN.Easing.Quadratic.InOut)
             .onUpdate(() => {
-                if (scope.aircraft) {
-                    scope.aircraft.rotation.y = rotation.y;
+                if (scope.decorations[objID]) {
+                    scope.decorations[objID].rotation.y = rotation.y;
                 }
             })
             .onComplete(() => {
@@ -256,7 +266,7 @@ export class Core {
         moveTween.start();
     }
     
-    loadBugatti1Model(mtl_path, obj_path) {
+    loadBugatti1Model(mtl_path, obj_path, position, rotation) {
         const scope = this;
     
         const mtlLoader = new MTLLoader();
@@ -269,7 +279,7 @@ export class Core {
                     obj_path, 
                     function(object) {
                         object.position.set(94, 0.29, 5);
-                        object.rotation.set(0, 4.71, 0);
+                        object.rotation.set(0, 4.72, 0);
                         //
                         const box = new Box3().setFromObject(object);
                         const size = box.getSize(new Vector3());

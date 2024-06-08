@@ -1,7 +1,7 @@
 import { Vector3, MeshPhongMaterial, Mesh, Sphere, Plane, BoxGeometry, Raycaster, Vector2, Box3 } from "three";
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
+import * as FontData_Bold_Italic from '../assets/fonts/Open_Sans_Bold_Italic.json';
 
 /**
  * 게임 시작 처리 클래스

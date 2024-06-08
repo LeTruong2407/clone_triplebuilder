@@ -1,7 +1,7 @@
 import { Vector3, MeshPhongMaterial, Group, Mesh, Plane, Color } from "three";
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
-import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
+import * as FontData_Bold_Italic from '../assets/fonts/Open_Sans_Bold_Italic.json';
 
 /**
  * 게임 시간 표시

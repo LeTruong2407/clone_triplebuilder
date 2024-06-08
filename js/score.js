@@ -1,5 +1,4 @@
-import * as FontData_Bold_Italic from './Open_Sans_Bold_Italic.json';
-import * as FontData_Bold from './Open_Sans_Bold.json';
+import * as FontData_Bold from '../assets/fonts/Open_Sans_Bold.json';
 import { MeshPhongMaterial, Mesh, Vector3, Plane, Box3, Group } from 'three';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
@@ -69,7 +68,6 @@ export class ScoreManager {
 
         // 폰트 데이터를 로드하고 준비시킨다.
         const fontLoader = new FontLoader();
-        this.fontData = fontLoader.parse(FontData_Bold_Italic);
         this.popupFontData = fontLoader.parse(FontData_Bold);
 
         // 사용할 텍스트 Geometry를 미리 생성해 놓는다.
