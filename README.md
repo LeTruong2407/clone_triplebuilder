@@ -1,5 +1,3 @@
-# This project uses some code in this repo: 
-https://github.com/Ozymandias1/triplebuilder/tree/master
 # triplebuilder
 Triple Builder is a three-match puzzle game inspired by Triple Town.
 
