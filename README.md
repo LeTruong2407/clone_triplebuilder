@@ -1,4 +1,4 @@
-# triplebuilder
+# Triple Builder
 Triple Builder is a three-match puzzle game inspired by Triple Town.
 
 The goal of the game is to build a building for five minutes and get high marks.
